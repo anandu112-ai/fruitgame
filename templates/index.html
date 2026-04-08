@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Word Puzzle Game</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#0f172a;
+color:white;
+text-align:center;
+padding:40px;
+}
+
+.container{
+background:#1e293b;
+padding:30px;
+border-radius:10px;
+width:350px;
+margin:auto;
+}
+
+button{
+background:#22c55e;
+border:none;
+padding:10px 20px;
+border-radius:6px;
+color:white;
+font-size:16px;
+cursor:pointer;
+margin:5px;
+}
+
+button:hover{
+background:#16a34a;
+}
+
+input{
+padding:10px;
+margin:10px;
+border-radius:5px;
+border:none;
+}
+
+#word{
+font-size:30px;
+letter-spacing:10px;
+margin:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>🍎 Word Puzzle Game</h2>
+
+<button onclick="startGame()">Start Game</button>
+
+<p id="word"></p>
+
+<input id="letter" maxlength="1" placeholder="Enter letter">
+
+<br>
+
+<button onclick="guess()">Guess</button>
+
+<p id="chance"></p>
+
+<p id="result"></p>
+
+</div>
+
+<script>
+
+async function startGame(){
+
+let res = await fetch("/start")
+
+let data = await res.json()
+
+document.getElementById("word").innerText=data.word.join(" ")
+
+document.getElementById("chance").innerText="Chance: "+data.chance
+
+document.getElementById("result").innerText=""
+
+}
+
+async function guess(){
+
+let letter=document.getElementById("letter").value
+
+let res=await fetch("/guess?letter="+letter)
+
+let data=await res.json()
+
+if(data.word){
+
+document.getElementById("word").innerText=data.word.join(" ")
+
+document.getElementById("chance").innerText="Chance: "+data.chance
+
+}
+
+if(data.result){
+
+document.getElementById("result").innerText=data.result+" | Word: "+data.word
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
