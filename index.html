@@ -5,11 +5,13 @@
 <title>Word Puzzle</title>
 
 <style>
+
 body{
 font-family:Arial;
 text-align:center;
 background:#f4f4f4;
 margin-top:30px;
+transition:0.5s;
 }
 
 #box{
@@ -34,6 +36,13 @@ font-size:16px;
 cursor:pointer;
 }
 
+#score{
+font-size:22px;
+margin:10px;
+font-weight:bold;
+color:#333;
+}
+
 .win{
 animation: flash 0.5s infinite alternate;
 }
@@ -55,6 +64,8 @@ animation: flash 0.5s infinite alternate;
 <h1>Word Puzzle</h1>
 <h3>Guess The Fruit 🍏</h3>
 
+<div id="score">Score: 0</div>
+
 <button onclick="startGame()">Start Game</button>
 
 <p id="word"></p>
@@ -70,6 +81,7 @@ animation: flash 0.5s infinite alternate;
 let secret_word=""
 let display=[]
 let chance=5
+let score=0
 
 function createKeyboard(){
 
@@ -129,14 +141,26 @@ chance--
 
 updateUI()
 
+// WIN
 if(!display.includes("_")){
+score++
+
+document.getElementById("score").innerText="Score: "+score
+
 document.getElementById("result").innerText="🎉 You Won! Word: "+secret_word
+
 document.body.classList.add("win")
 }
 
+// LOSE
 if(chance<=0){
+score=0
+
+document.getElementById("score").innerText="Score: "+score
+
 document.getElementById("result").innerText="💀 Game Over! Word: "+secret_word
 }
+
 }
 
 function updateUI(){
