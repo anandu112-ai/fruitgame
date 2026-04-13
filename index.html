@@ -2,16 +2,14 @@
 <html>
 
 <head>
-<title>Word Puzzle Game</title>
+<title>Word Puzzle</title>
 
 <style>
-
 body{
 font-family:Arial;
 text-align:center;
 background:#f4f4f4;
 margin-top:30px;
-transition:0.5s;
 }
 
 #box{
@@ -26,35 +24,28 @@ box-shadow:0 0 20px rgba(0,0,0,0.2);
 #word{
 font-size:40px;
 letter-spacing:12px;
-margin:25px;
+margin:20px;
 }
 
 button{
-padding:12px 18px;
-margin:5px;
-font-size:18px;
+padding:10px;
+margin:4px;
+font-size:16px;
 cursor:pointer;
-border:none;
-border-radius:6px;
-background:#3498db;
-color:white;
-}
-
-#keyboard{
-margin-top:25px;
 }
 
 .win{
-animation: winflash 0.6s infinite alternate;
+animation: flash 0.5s infinite alternate;
 }
 
-@keyframes winflash{
+@keyframes flash{
 0%{background:#2ecc71;}
 50%{background:#f1c40f;}
 100%{background:#e74c3c;}
 }
 
 </style>
+
 </head>
 
 <body>
@@ -62,13 +53,13 @@ animation: winflash 0.6s infinite alternate;
 <div id="box">
 
 <h1>Word Puzzle</h1>
-<h3>Guess The Fruit Name 🍏🍎</h3>
+<h3>Guess The Fruit 🍏</h3>
+
+<button onclick="startGame()">Start Game</button>
 
 <p id="word"></p>
 <p id="chance"></p>
 <p id="result"></p>
-
-<button onclick="startGame()">Start Game</button>
 
 <div id="keyboard"></div>
 
@@ -76,14 +67,14 @@ animation: winflash 0.6s infinite alternate;
 
 <script>
 
-let word = ""
-let display = []
-let chance = 5
+let secret_word=""
+let display=[]
+let chance=5
 
 function createKeyboard(){
 
-let keyboard=document.getElementById("keyboard")
-keyboard.innerHTML=""
+let k=document.getElementById("keyboard")
+k.innerHTML=""
 
 for(let i=65;i<=90;i++){
 
@@ -97,7 +88,7 @@ guess(letter)
 btn.disabled=true
 }
 
-keyboard.appendChild(btn)
+k.appendChild(btn)
 
 }
 }
@@ -109,27 +100,26 @@ document.body.classList.remove("win")
 let res=await fetch("/start")
 let data=await res.json()
 
-word = data.word.toLowerCase()
-display = Array(word.length).fill("_")
-chance = 5
+secret_word=data.word.toLowerCase()
+display=Array(secret_word.length).fill("_")
+chance=5
 
 updateUI()
+createKeyboard()
 
 document.getElementById("result").innerText=""
-
-createKeyboard()
 }
 
 function guess(letter){
 
-letter = letter.toLowerCase()
+letter=letter.toLowerCase()
 
-let correct = false
+let correct=false
 
-for(let i=0;i<word.length;i++){
-if(word[i]===letter){
+for(let i=0;i<secret_word.length;i++){
+if(secret_word[i]==letter){
 display[i]=letter
-correct = true
+correct=true
 }
 }
 
@@ -140,18 +130,18 @@ chance--
 updateUI()
 
 if(!display.includes("_")){
-document.getElementById("result").innerText="🎉 You Won! Word: "+word
+document.getElementById("result").innerText="🎉 You Won! Word: "+secret_word
 document.body.classList.add("win")
 }
 
 if(chance<=0){
-document.getElementById("result").innerText="💀 Game Over! Word: "+word
+document.getElementById("result").innerText="💀 Game Over! Word: "+secret_word
 }
 }
 
 function updateUI(){
-document.getElementById("word").innerText = display.join(" ")
-document.getElementById("chance").innerText = "Chance: "+chance
+document.getElementById("word").innerText=display.join(" ")
+document.getElementById("chance").innerText="Chance: "+chance
 }
 
 </script>
