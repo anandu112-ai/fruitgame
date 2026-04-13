@@ -2,7 +2,6 @@
 <html>
 
 <head>
-
 <title>Word Puzzle Game</title>
 
 <style>
@@ -24,10 +23,6 @@ border-radius:15px;
 box-shadow:0 0 20px rgba(0,0,0,0.2);
 }
 
-h1{
-font-size:40px;
-}
-
 #word{
 font-size:40px;
 letter-spacing:12px;
@@ -45,24 +40,8 @@ background:#3498db;
 color:white;
 }
 
-button:hover{
-background:#2980b9;
-}
-
 #keyboard{
 margin-top:25px;
-}
-
-#next{
-display:none;
-margin-top:20px;
-background:#2ecc71;
-}
-
-#score{
-font-size:22px;
-margin-top:10px;
-color:#333;
 }
 
 .win{
@@ -76,7 +55,6 @@ animation: winflash 0.6s infinite alternate;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -86,30 +64,25 @@ animation: winflash 0.6s infinite alternate;
 <h1>Word Puzzle</h1>
 <h3>Guess The Fruit Name 🍏🍎</h3>
 
-<div id="score">Score: 0</div>
-
-<br>
-
-<button onclick="startGame()">Start Game</button>
-
 <p id="word"></p>
 <p id="chance"></p>
 <p id="result"></p>
 
-<div id="keyboard"></div>
+<button onclick="startGame()">Start Game</button>
 
-<button id="next" onclick="startGame()">Next Game</button>
+<div id="keyboard"></div>
 
 </div>
 
 <script>
 
-let score=0
+let word = ""
+let display = []
+let chance = 5
 
 function createKeyboard(){
 
 let keyboard=document.getElementById("keyboard")
-
 keyboard.innerHTML=""
 
 for(let i=65;i<=90;i++){
@@ -117,7 +90,6 @@ for(let i=65;i<=90;i++){
 let letter=String.fromCharCode(i)
 
 let btn=document.createElement("button")
-
 btn.innerText=letter
 
 btn.onclick=function(){
@@ -128,7 +100,6 @@ btn.disabled=true
 keyboard.appendChild(btn)
 
 }
-
 }
 
 async function startGame(){
@@ -138,83 +109,49 @@ document.body.classList.remove("win")
 let res=await fetch("/start")
 let data=await res.json()
 
-document.getElementById("word").innerText=data.word.join(" ")
-document.getElementById("chance").innerText="Chance: "+data.chance
+word = data.word.toLowerCase()
+display = Array(word.length).fill("_")
+chance = 5
+
+updateUI()
+
 document.getElementById("result").innerText=""
 
-document.getElementById("next").style.display="none"
-
 createKeyboard()
-
 }
 
-async function guess(letter){
+function guess(letter){
 
-let res=await fetch("/guess?letter="+letter)
+letter = letter.toLowerCase()
 
-let data=await res.json()
+let correct = false
 
-document.getElementById("word").innerText=data.word.join(" ")
-document.getElementById("chance").innerText="Chance: "+data.chance
+for(let i=0;i<word.length;i++){
+if(word[i]===letter){
+display[i]=letter
+correct = true
+}
+}
 
-if(data.status=="won"){
+if(!correct){
+chance--
+}
 
-score++
+updateUI()
 
-document.getElementById("score").innerText="Score: "+score
-
-document.getElementById("result").innerText="🎉 You Won! Word: "+data.answer
-
+if(!display.includes("_")){
+document.getElementById("result").innerText="🎉 You Won! Word: "+word
 document.body.classList.add("win")
-
-confetti()
-
-document.getElementById("next").style.display="inline-block"
-
 }
 
-if(data.status=="lost"){
-
-document.getElementById("result").innerText="💀 Game Over! Word: "+data.answer
-
-document.getElementById("next").style.display="inline-block"
-
+if(chance<=0){
+document.getElementById("result").innerText="💀 Game Over! Word: "+word
+}
 }
 
-}
-
-function confetti(){
-
-for(let i=0;i<80;i++){
-
-let conf=document.createElement("div")
-
-conf.style.position="fixed"
-conf.style.width="8px"
-conf.style.height="8px"
-conf.style.backgroundColor="hsl("+Math.random()*360+",100%,50%)"
-conf.style.left=Math.random()*100+"%"
-conf.style.top="-10px"
-conf.style.opacity="0.8"
-conf.style.zIndex="999"
-
-document.body.appendChild(conf)
-
-let fall=setInterval(()=>{
-
-conf.style.top=parseInt(conf.style.top)+5+"px"
-
-if(parseInt(conf.style.top)>window.innerHeight){
-
-conf.remove()
-clearInterval(fall)
-
-}
-
-},20)
-
-}
-
+function updateUI(){
+document.getElementById("word").innerText = display.join(" ")
+document.getElementById("chance").innerText = "Chance: "+chance
 }
 
 </script>
